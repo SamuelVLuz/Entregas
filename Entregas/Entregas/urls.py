@@ -18,8 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 from .import views
 
+app_name = 'rotas'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-    # path('crud/', include('crud.urls')),
+    path('', include('rotas.urls')),
+    # path('crud/deletar/<int:carro_id>', views.deletar_carro, name='deletar_carro'),
+    # path('crud/atualizar/<int:carro_id>', views.atualizar_carro, name='atualizar_carro'),
 ]

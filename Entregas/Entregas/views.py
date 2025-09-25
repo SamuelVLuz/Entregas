@@ -5,3 +5,6 @@ def home(request):
     }
 
     return render(request, 'conteudo.html', context)
+
+def upload_pdf(request):
+    return render(request, 'rotas/upload_pdf.html')
