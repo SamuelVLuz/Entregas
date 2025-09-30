@@ -23,7 +23,7 @@ app_name = 'rotas'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-    path('', include('rotas.urls')),
+    path('rotas/', include('rotas.urls')),
     # path('crud/deletar/<int:carro_id>', views.deletar_carro, name='deletar_carro'),
     # path('crud/atualizar/<int:carro_id>', views.atualizar_carro, name='atualizar_carro'),
 ]
