@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa da Rota - {{ rota.nome }}</title>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+            border: 1px solid #aaa;
+            margin-top: 10px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rota: {{ rota.nome }}</h1>
+    <p>Distância total estimada: <strong>{{ distancia }} km</strong></p>
+
+    <div id="map"></div>
+
+    <br>
+    <a href="{% url 'rotas:gerar_pdf_rota' rota.id %}">📄 Gerar PDF</a> |
+    <a href="{% url 'rotas:listar_rotas' %}">⬅ Voltar</a>
+
+    <script>
+        const coordenadas = {{ coordenadas|safe }};
+        const map = L.map('map');
+
+        // Adiciona camada base (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // Ajusta os limites do mapa
+        const latlngs = coordenadas.map(c => [c.lat, c.lng]);
+        const bounds = L.latLngBounds(latlngs);
+        map.fitBounds(bounds);
+
+        // Adiciona marcadores e numeração
+        coordenadas.forEach(c => {
+            const marker = L.marker([c.lat, c.lng]).addTo(map);
+            marker.bindPopup(`<b>Entrega ${c.index}</b><br>${c.endereco}`);
+        });
+
+        // Desenha a linha da rota (polilinha)
+        L.polyline(latlngs, { color: 'blue', weight: 4 }).addTo(map);
+    </script>
+</body>
+</html>

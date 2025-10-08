@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Rota</title>
+</head>
+<body>
+  <h1>Editar Rota: {{ rota.nome }}</h1>
+
+  <h2>Entregas atuais</h2>
+  {% if entregas %}
+    <table border="1" cellpadding="6">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Cidade</th>
+          <th>UF</th>
+          <th>Data Emissão</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entrega in entregas %}
+        <tr>
+          <td>{{ entrega.nome }}</td>
+          <td>{{ entrega.cidade }}</td>
+          <td>{{ entrega.uf }}</td>
+          <td>{{ entrega.data_emissao|date:"d/m/Y" }}</td>
+          <td>
+            <a href="{% url 'rotas:excluir_entrega' rota.id entrega.id %}" 
+               onclick="return confirm('Deseja excluir esta entrega?')">❌ Excluir</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Nenhuma entrega cadastrada.</p>
+  {% endif %}
+
+  <h2>Adicionar nova entrega</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <br>
+  <a href="{% url 'rotas:listar_rotas' %}">⬅ Voltar</a>
+</body>
+</html>

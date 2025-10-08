@@ -1,5 +1,63 @@
-<form method="post" enctype="multipart/form-data">
+<style>
+  .dropzone {
+    border: 2px dashed #ccc;
+    padding: 30px;
+    text-align: center;
+    color: #999;
+    margin-bottom: 15px;
+    transition: background-color 0.2s ease;
+  }
+
+  .dropzone.dragover {
+    background-color: #f0f0f0;
+    border-color: #333;
+    color: #333;
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+</style>
+
+<form id="upload-form" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
+
+    <p>
+        {{ form.title.label_tag }}<br>
+        {{ form.title }}
+    </p>
+
+    <div class="dropzone" id="dropzone">
+        Arraste os PDFs aqui ou clique para selecionar.
+        <br>
+        <input id="file-input" type="file" name="pdf_files" accept="application/pdf" multiple>
+    </div>
+
     <button type="submit">Enviar PDFs</button>
 </form>
+
+<script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+
+        const files = e.dataTransfer.files;
+
+        // Força os arquivos para o input (simula seleção manual)
+        fileInput.files = files;
+    });
+</script>

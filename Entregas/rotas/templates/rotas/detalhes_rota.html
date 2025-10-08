@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Detalhes da Rota</title>
+</head>
+<body>
+  <h1>Rota: {{ rota.nome }}</h1>
+  <p>Data de criação: {{ rota.data_criacao|date:"d/m/Y H:i" }}</p>
+
+  <h2>Entregas</h2>
+  {% if entregas %}
+    <ul>
+      {% for entrega in entregas %}
+        <li>
+          <strong>{{ entrega.nome }}</strong> - {{ entrega.endereco }}, {{ entrega.cidade }}/{{ entrega.uf }}
+          <br>Emitida em: {{ entrega.data_emissao|date:"d/m/Y" }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Nenhuma entrega cadastrada nesta rota.</p>
+  {% endif %}
+
+  <br>
+  <a href="{% url 'rotas:listar_rotas' %}">⬅ Voltar para lista</a>
+</body>
+</html>
