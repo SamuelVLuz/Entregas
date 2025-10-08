@@ -1,43 +1,39 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <title>Listagem de Rotas</title>
-</head>
-<body>
-  <h1>Rotas Cadastradas</h1>
+{% extends 'menu.html' %}
 
-  {% if rotas %}
-    <table border="1" cellpadding="6">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Data de Criação</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for rota in rotas %}
-          <tr>
-            <td>{{ rota.nome }}</td>
-            <td>{{ rota.data_criacao|date:"d/m/Y H:i" }}</td>
-            <td>
-              <a href="{% url 'rotas:detalhes_rota' rota.id %}">🔍 Visualizar</a> |
-              <a href="{% url 'rotas:editar_rota' rota.id %}">✏️ Editar</a> |
-              <a href="{% url 'rotas:excluir_rota' rota.id %}" onclick="return confirm('Tem certeza que deseja excluir esta rota?')">❌ Excluir</a>|
-              <a href="{% url 'rotas:gerar_pdf_rota' rota.id %}">📄 Gerar PDF da rota</a>|              
-              <a href="{% url 'rotas:mapa_rota' rota.id %}">📍 Ver no mapa</a>
+{% block conteudo %}
 
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>Nenhuma rota cadastrada ainda.</p>
-  {% endif %}
+<h1 class="mb-4">Rotas Cadastradas</h1>
 
-  <br>
-  <a href="{% url 'rotas:upload_pdf' %}">+ Criar nova rota</a>
-</body>
-</html>
+{% if rotas %}
+<div class="table-responsive">
+  <table class="table table-striped table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>Nome</th>
+        <th>Data de Criação</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rota in rotas %}
+      <tr>
+        <td>{{ rota.nome }}</td>
+        <td>{{ rota.data_criacao|date:"d/m/Y H:i" }}</td>
+        <td>
+          <a href="{% url 'rotas:detalhes_rota' rota.id %}" class="btn btn-sm btn-info text-white">🔍 Visualizar</a>
+          <a href="{% url 'rotas:editar_rota' rota.id %}" class="btn btn-sm btn-warning text-white">✏️ Editar</a>
+          <a href="{% url 'rotas:excluir_rota' rota.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir esta rota?')">❌ Excluir</a>
+          <a href="{% url 'rotas:gerar_pdf_rota' rota.id %}" class="btn btn-sm btn-secondary">📄 PDF</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted">Nenhuma rota cadastrada ainda.</p>
+{% endif %}
+
+<a href="{% url 'rotas:upload_pdf' %}" class="btn btn-primary mt-3">+ Criar nova rota</a>
+
+{% endblock %}

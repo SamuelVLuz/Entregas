@@ -1,51 +1,57 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <title>Editar Rota</title>
-</head>
-<body>
-  <h1>Editar Rota: {{ rota.nome }}</h1>
+{% extends 'menu.html' %}
 
-  <h2>Entregas atuais</h2>
-  {% if entregas %}
-    <table border="1" cellpadding="6">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Cidade</th>
-          <th>UF</th>
-          <th>Data Emissão</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for entrega in entregas %}
-        <tr>
-          <td>{{ entrega.nome }}</td>
-          <td>{{ entrega.cidade }}</td>
-          <td>{{ entrega.uf }}</td>
-          <td>{{ entrega.data_emissao|date:"d/m/Y" }}</td>
-          <td>
-            <a href="{% url 'rotas:excluir_entrega' rota.id entrega.id %}" 
-               onclick="return confirm('Deseja excluir esta entrega?')">❌ Excluir</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>Nenhuma entrega cadastrada.</p>
-  {% endif %}
+{% block conteudo %}
 
-  <h2>Adicionar nova entrega</h2>
-  <form method="post">
-    {% csrf_token %}
+<h1 class="mb-4">Editar Rota: {{ rota.nome }}</h1>
+
+<h2 class="mt-4 mb-3">Entregas atuais</h2>
+
+{% if entregas %}
+<div class="table-responsive">
+  <table class="table table-striped table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>Nome</th>
+        <th>Endereço</th>
+        <th>Bairro</th>
+        <th>Cidade</th>
+        <th>UF</th>
+        <th>Data Emissão</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entrega in entregas %}
+      <tr>
+        <td>{{ entrega.nome }}</td>
+        <td>{{ entrega.endereco }}</td>
+        <td>{{ entrega.bairro }}</td>
+        <td>{{ entrega.cidade }}</td>
+        <td>{{ entrega.uf }}</td>
+        <td>{{ entrega.data_emissao|date:"d/m/Y" }}</td>
+        <td>
+          <a href="{% url 'rotas:excluir_entrega' rota.id entrega.id %}" 
+             class="btn btn-sm btn-danger"
+             onclick="return confirm('Deseja excluir esta entrega?')">❌ Excluir</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted">Nenhuma entrega cadastrada.</p>
+{% endif %}
+
+<h2 class="mt-5 mb-3">Adicionar nova entrega</h2>
+<form method="post" class="mb-4">
+  {% csrf_token %}
+  <div class="mb-3">
     {{ form.as_p }}
-    <button type="submit">Adicionar</button>
-  </form>
+  </div>
+  <button type="submit" class="btn btn-primary">Adicionar</button>
+</form>
 
-  <br>
-  <a href="{% url 'rotas:listar_rotas' %}">⬅ Voltar</a>
-</body>
-</html>
+<a href="{% url 'rotas:listar_rotas' %}" class="btn btn-secondary">⬅ Voltar</a>
+
+{% endblock %}

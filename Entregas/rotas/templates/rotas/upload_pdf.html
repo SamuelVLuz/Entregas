@@ -1,3 +1,6 @@
+{% extends 'conteudo.html' %}
+{% block conteudo %}
+
 <style>
   .dropzone {
     border: 2px dashed #ccc;
@@ -6,6 +9,7 @@
     color: #999;
     margin-bottom: 15px;
     transition: background-color 0.2s ease;
+    cursor: pointer;
   }
 
   .dropzone.dragover {
@@ -14,16 +18,18 @@
     color: #333;
   }
 
-  input[type="file"] {
-    display: none;
-  }
+  input[type="file"] { display: none; }
+
+  ul#file-list { list-style-type: none; padding: 0; text-align: left; }
+  ul#file-list li { margin: 6px 0; background: #f7f7f7; padding: 8px 10px; border-radius: 4px; border: 1px solid #ddd; display:flex; justify-content:space-between; align-items:center;}
+  ul#file-list button.remove { background: #e74c3c; color: white; border: 0; padding: 4px 8px; border-radius: 4px; cursor:pointer; }
 </style>
 
 <form id="upload-form" method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
     <p>
-        {{ form.title.label_tag }}<br>
+        <label for="id_title">Nome da Rota:</label><br>
         {{ form.title }}
     </p>
 
@@ -33,31 +39,97 @@
         <input id="file-input" type="file" name="pdf_files" accept="application/pdf" multiple>
     </div>
 
+    <ul id="file-list"></ul>
+
     <button type="submit">Enviar PDFs</button>
 </form>
 
 <script>
-    const dropzone = document.getElementById('dropzone');
-    const fileInput = document.getElementById('file-input');
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('file-input');
+  const fileList = document.getElementById('file-list');
 
-    dropzone.addEventListener('click', () => fileInput.click());
+  // DataTransfer para manter uma "staging area" de arquivos selecionados
+  const dt = new DataTransfer();
 
-    dropzone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropzone.classList.add('dragover');
-    });
+  function atualizarLista() {
+    fileList.innerHTML = "";
+    const files = dt.files;
+    if (files.length === 0) {
+      const li = document.createElement('li');
+      li.textContent = 'Nenhum arquivo selecionado.';
+      fileList.appendChild(li);
+      return;
+    }
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const li = document.createElement('li');
+      const span = document.createElement('span');
+      span.textContent = file.name;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'remove';
+      btn.textContent = 'Remover';
+      btn.dataset.index = i;
+      btn.addEventListener('click', (e) => {
+        const idx = Number(e.currentTarget.dataset.index);
+        // remove do DataTransfer
+        dt.items.remove(idx);
+        fileInput.files = dt.files;
+        atualizarLista();
+      });
+      li.appendChild(span);
+      li.appendChild(btn);
+      fileList.appendChild(li);
+    }
+    // sincroniza o input real com dt
+    fileInput.files = dt.files;
+  }
 
-    dropzone.addEventListener('dragleave', () => {
-        dropzone.classList.remove('dragover');
-    });
+  function addFilesToDT(fileListObj) {
+    // fileListObj pode ser FileList
+    for (let i = 0; i < fileListObj.length; i++) {
+      const file = fileListObj[i];
+      // evitar duplicates simples (mesmo nome + tamanho)
+      let exists = false;
+      for (let j = 0; j < dt.files.length; j++) {
+        if (dt.files[j].name === file.name && dt.files[j].size === file.size && dt.files[j].lastModified === file.lastModified) {
+          exists = true; break;
+        }
+      }
+      if (!exists) dt.items.add(file);
+    }
+    fileInput.files = dt.files;
+    atualizarLista();
+  }
 
-    dropzone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropzone.classList.remove('dragover');
+  dropzone.addEventListener('click', () => fileInput.click());
 
-        const files = e.dataTransfer.files;
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('dragover');
+  });
 
-        // Força os arquivos para o input (simula seleção manual)
-        fileInput.files = files;
-    });
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('dragover');
+  });
+
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    addFilesToDT(e.dataTransfer.files);
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    // adiciona, não substitui
+    addFilesToDT(e.target.files);
+    // limpa o input nativo para permitir re-seleção do mesmo arquivo se precisar
+    // (mas não remove os arquivos já no dt)
+    e.target.value = '';
+  });
+
+  // inicializa lista
+  atualizarLista();
 </script>
+
+{% endblock %}

@@ -1,4 +1,35 @@
 {% extends 'menu.html' %}
+
 {% block conteudo %}
-    <h1>Olá, {{ nome }}</h1>
+
+<h1 class="mb-4">Bem-vindo ao Calculador de Rotas</h1>
+
+<div class="row">
+  <!-- Card 1: Total de Rotas -->
+  <div class="col-md-4 mb-3">
+    <div class="card text-white bg-primary h-100">
+      <div class="card-body">
+        <h5 class="card-title">Rotas cadastradas</h5>
+        <p class="card-text display-5">{{ total_rotas }}</p>
+      </div>
+      <div class="card-footer">
+        <a href="{% url 'rotas:listar_rotas' %}" class="btn btn-light btn-sm">Ver rotas</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2: Criar nova rota -->
+  <div class="col-md-4 mb-3">
+    <div class="card text-white bg-warning h-100">
+      <div class="card-body">
+        <h5 class="card-title">Criar nova rota</h5>
+        <p class="card-text">Adicione uma nova rota rapidamente</p>
+      </div>
+      <div class="card-footer">
+        <a href="{% url 'rotas:upload_pdf' %}" class="btn btn-light btn-sm">Criar rota</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

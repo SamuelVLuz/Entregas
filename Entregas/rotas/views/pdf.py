@@ -37,7 +37,7 @@ def upload_pdf(request):
                 # Adiciona a entrega à rota (ManyToMany)
                 rota.entregas.add(entrega)
 
-            return redirect('rotas:success')
+            return redirect('rotas:editar_rota', rota_id=rota.id)
     else:
         form = PDFUploadForm()
 

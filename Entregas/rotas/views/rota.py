@@ -5,7 +5,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from django.http import FileResponse
 import io
-from rotas.utils.rota_otimizador import melhor_ordem_enderecos
+from rotas.utils.ors_rotas import *
 
 def listar_rotas(request):
     rotas = Rota.objects.all().order_by('-data_criacao')
@@ -39,9 +39,9 @@ def editar_rota(request, rota_id):
 
 def gerar_pdf_rota(request, rota_id):
     rota = get_object_or_404(Rota, id=rota_id)
-    enderecos = [f"{e.endereco}, {e.cidade}, {e.uf}" for e in rota.entregas.all()]
+    entregas = list(rota.entregas.all())
 
-    ordem, distancia = melhor_ordem_enderecos(enderecos)
+    ordem, distancia = melhor_ordem_entregas_ors(entregas)
 
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer)
@@ -53,12 +53,24 @@ def gerar_pdf_rota(request, rota_id):
     story.append(Spacer(1, 12))
 
     story.append(Paragraph("Ordem sugerida de entregas:", styles['Heading2']))
-    for i, coord in enumerate(ordem, start=1):
-        story.append(Paragraph(f"{i}. {coord}", styles['Normal']))
+    story.append(Spacer(1, 6))
+
+    if not ordem:
+        story.append(Paragraph("Nenhuma entrega com endereço válido foi encontrada.", styles['Normal']))
+    else:
+        for i, e in enumerate(ordem, start=1):
+            story.append(Paragraph(f"<b>{i}. {e.nome}</b>", styles['Normal']))
+            story.append(Paragraph(f"Endereço: {e.endereco}", styles['Normal']))
+            story.append(Paragraph(f"Bairro: {e.bairro}", styles['Normal']))
+            story.append(Paragraph(f"Cidade/UF: {e.cidade} - {e.uf}", styles['Normal']))
+            story.append(Paragraph(f"CEP: {e.cep}", styles['Normal']))
+            story.append(Paragraph(f"Data de emissão: {e.data_emissao}", styles['Normal']))
+            story.append(Spacer(1, 8))
 
     doc.build(story)
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"rota_{rota.id}.pdf")
+
 
 def mapa_rota(request, rota_id):
     rota = get_object_or_404(Rota, id=rota_id)
