@@ -25,7 +25,6 @@ def editar_rota(request, rota_id):
     rota = get_object_or_404(Rota, id=rota_id)
 
     if request.method == 'POST':
-        # Adicionar nova entrega
         form = EntregasForm(request.POST)
         if form.is_valid():
             entrega = form.save()
@@ -76,10 +75,8 @@ def mapa_rota(request, rota_id):
     rota = get_object_or_404(Rota, id=rota_id)
     enderecos = [f"{e.endereco}, {e.cidade}, {e.uf}" for e in rota.entregas.all()]
 
-    # Calcula a melhor ordem
-    ordem, distancia = melhor_ordem_enderecos(enderecos)
+    ordem, distancia = melhor_ordem_entregas_ors(enderecos)
 
-    # Gera coordenadas formatadas para o Leaflet
     coordenadas = []
     for i, coord in enumerate(ordem, start=1):
         coordenadas.append({

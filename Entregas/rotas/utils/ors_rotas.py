@@ -18,9 +18,6 @@ def obter_coordenadas(endereco):
 
 
 def melhor_ordem_entregas_ors(entregas):
-    """
-    Retorna lista de entregas na ordem otimizada pelo ORS e distância total (m).
-    """
 
     entregas_coords = []
     for e in entregas:
@@ -28,21 +25,20 @@ def melhor_ordem_entregas_ors(entregas):
         coord = obter_coordenadas(endereco_completo)
         if coord:
             entregas_coords.append((e, coord))
+        else:
+            print(f"Não foi possível geocodificar: {endereco_completo}")
 
     if len(entregas_coords) < 2:
+        # Se não houver coordenadas suficientes, retorna na ordem original
         return [e for e, _ in entregas_coords], 0
 
     try:
+        # Preparar dados para a Optimization API
         coords = [coord for _, coord in entregas_coords]
         jobs = [{"id": i + 1, "location": coord} for i, coord in enumerate(coords)]
-
-        # Veículo que começa e termina no primeiro ponto
         vehicles = [{"id": 1, "start": coords[0], "end": coords[0]}]
 
         resp = client.optimization(jobs=jobs, vehicles=vehicles)
-
-        # Debug opcional
-        # import json; print(json.dumps(resp, indent=2))
 
         route = resp["routes"][0]
         steps = route.get("steps", [])
@@ -52,7 +48,6 @@ def melhor_ordem_entregas_ors(entregas):
         for step in steps:
             job_id = step.get("job")
             if job_id:
-                # IDs começam em 1, então ajusta o índice
                 ent, _ = entregas_coords[job_id - 1]
                 entregas_ordenadas.append(ent)
 
@@ -60,4 +55,5 @@ def melhor_ordem_entregas_ors(entregas):
 
     except Exception as e:
         print("Erro ORS otimização:", e)
+        # fallback: retorna todas as entregas válidas na ordem original
         return [e for e, _ in entregas_coords], 0
