@@ -29,11 +29,9 @@ def melhor_ordem_entregas_ors(entregas):
             print(f"Não foi possível geocodificar: {endereco_completo}")
 
     if len(entregas_coords) < 2:
-        # Se não houver coordenadas suficientes, retorna na ordem original
         return [e for e, _ in entregas_coords], 0
 
     try:
-        # Preparar dados para a Optimization API
         coords = [coord for _, coord in entregas_coords]
         jobs = [{"id": i + 1, "location": coord} for i, coord in enumerate(coords)]
         vehicles = [{"id": 1, "start": coords[0], "end": coords[0]}]
@@ -55,5 +53,4 @@ def melhor_ordem_entregas_ors(entregas):
 
     except Exception as e:
         print("Erro ORS otimização:", e)
-        # fallback: retorna todas as entregas válidas na ordem original
         return [e for e, _ in entregas_coords], 0

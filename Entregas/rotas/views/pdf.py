@@ -12,18 +12,15 @@ def upload_pdf(request):
             title = form.cleaned_data['title']
             files = request.FILES.getlist('pdf_files')
 
-            # Cria a rota
             rota = Rota.objects.create(nome=title)
 
             fs = FileSystemStorage()
             for f in files:
                 filename = fs.save(f.name, f)
-                path = fs.path(filename)  # caminho no disco
+                path = fs.path(filename)
 
-                # Extrai os campos do PDF
                 campos = extrair_campos_pdf(path)
 
-                # Cria a entrega (sem campo 'rota')
                 entrega = Entrega.objects.create(
                     nome=campos.get('nome') or 'Não identificado',
                     endereco=campos.get('endereco') or 'Não informado',
@@ -34,7 +31,6 @@ def upload_pdf(request):
                     data_emissao=campos.get('data_emissao') or None,
                 )
 
-                # Adiciona a entrega à rota (ManyToMany)
                 rota.entregas.add(entrega)
 
             return redirect('rotas:editar_rota', rota_id=rota.id)

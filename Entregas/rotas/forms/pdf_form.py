@@ -3,7 +3,7 @@ from rotas.models import Entrega
 from django.forms.widgets import FileInput
 
 class MultiplePDFInput(forms.ClearableFileInput):
-    allow_multiple_selected = True  # permite múltiplos arquivos
+    allow_multiple_selected = True
 
 
 class MultiplePDFField(forms.FileField):
@@ -12,7 +12,6 @@ class MultiplePDFField(forms.FileField):
         super().__init__(*args, **kwargs)
 
     def clean(self, data, initial=None):
-        # Permite validar lista de arquivos
         if not data:
             return []
         if isinstance(data, (list, tuple)):
